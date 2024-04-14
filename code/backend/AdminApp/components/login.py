@@ -12,6 +12,9 @@ env_helper: EnvHelper = EnvHelper()
 
 
 def isLoggedIn() -> bool:
+    if env_helper.AUTH_DISABLED:
+        return True
+
     if "access_data" not in st.session_state:
         return False
     if not st.session_state.access_data:
