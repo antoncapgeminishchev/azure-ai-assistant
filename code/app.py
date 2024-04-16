@@ -1,15 +1,17 @@
-from functools import wraps
 import json
-import logging
-from os import path
-import os
 import jwt
-import requests
-from openai import AzureOpenAI
+import logging
 import mimetypes
+import os
+import requests
+import sys
+
+from functools import wraps
+from os import path
+from openai import AzureOpenAI
 from flask import Flask, Response, request, jsonify
 from dotenv import load_dotenv
-import sys
+
 from backend.batch.utilities.helpers.EnvHelper import EnvHelper
 from backend.auth.token_validator import TokenValidator
 

@@ -1,15 +1,16 @@
 import json
-from os import path
+import urllib.parse
+import sys
 import os
 import re
 import streamlit as st
-from typing import Optional
 import mimetypes
 import traceback
 import chardet
-from datetime import datetime, timedelta
 import logging
 import requests
+
+from datetime import datetime, timedelta
 from azure.identity import DefaultAzureCredential
 from azure.storage.blob import (
     BlobServiceClient,
@@ -17,11 +18,11 @@ from azure.storage.blob import (
     ContentSettings,
     UserDelegationKey,
 )
-import urllib.parse
-import sys
+from typing import Optional
+from os import path
 from batch.utilities.helpers.ConfigHelper import ConfigHelper
 from batch.utilities.helpers.EnvHelper import EnvHelper
-from batch.utilities.document_loading.SharePoint import SharePointLoading
+from utilities.helpers.SharePoint import SharePointHelper
 from components.login import isLoggedIn
 from components.menu import menu
 
@@ -55,7 +56,8 @@ def main():
     ) -> UserDelegationKey:
         # Get a user delegation key that's valid for 1 day
         delegation_key_start_time = datetime.utcnow()
-        delegation_key_expiry_time = delegation_key_start_time + timedelta(days=1)
+        delegation_key_expiry_time = delegation_key_start_time + \
+            timedelta(days=1)
 
         user_delegation_key = blob_service_client.get_user_delegation_key(
             key_start_time=delegation_key_start_time,
@@ -98,8 +100,8 @@ def main():
         for url in urls:
 
             if is_sharepoint_url(url):
-                sharepoint_loader = SharePointLoading()
-                pages = sharepoint_loader.load(url)
+                sharepoint_helper = SharePointHelper()
+                pages = sharepoint_helper.get_pages(url)
                 if pages is not None:
                     for page in pages:
                         file_name = f'{page["title"]}.json'
@@ -153,7 +155,8 @@ def main():
             blob_client.upload_blob(
                 bytes_data,
                 overwrite=True,
-                content_settings=ContentSettings(content_type=content_type + charset),
+                content_settings=ContentSettings(
+                    content_type=content_type + charset),
             )
             st.session_state["file_url"] = (
                 blob_client.url
@@ -186,7 +189,8 @@ def main():
             blob_client.upload_blob(
                 bytes_data,
                 overwrite=True,
-                content_settings=ContentSettings(content_type=content_type + charset),
+                content_settings=ContentSettings(
+                    content_type=content_type + charset),
             )
             # Generate a SAS URL to the blob and return it
             st.session_state["file_url"] = (
