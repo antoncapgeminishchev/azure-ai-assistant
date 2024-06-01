@@ -176,6 +176,8 @@ class EnvHelper:
             "1",
             "t",
         )
+        self.search_k_nearest_neighbors = int(os.getenv("AZURE_SEARCH_TOP_K_NEAREST_NEIGHBORS", 4))
+        self.search_score_threshold = float(os.getenv("AZURE_SEARCH_SCORE_THRESHOLD", 0.0))
 
     def should_use_data(self) -> bool:
         if (

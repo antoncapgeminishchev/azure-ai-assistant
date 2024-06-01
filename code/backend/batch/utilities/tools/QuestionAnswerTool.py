@@ -15,15 +15,19 @@ from langchain_community.vectorstores.azuresearch import (
 from ..helpers.AzureSearchHelper import AzureSearchHelper
 from ..helpers.ConfigHelper import ConfigHelper
 from ..helpers.LLMHelper import LLMHelper
+from ..helpers.EnvHelper import EnvHelper
 from ..common.Answer import Answer
 from ..common.SourceDocument import SourceDocument
-
+from azure.search.documents.models import VectorizedQuery
 
 class QuestionAnswerTool(AnsweringToolBase):
     def __init__(self) -> None:
+        env_helper = EnvHelper()
         self.name = "QuestionAnswer"
         self.vector_store = AzureSearchHelper().get_vector_store()
         self.verbose = True
+        self.search_k_nearest_neighbors = env_helper.search_k_nearest_neighbors
+        self.search_score_threshold = env_helper.search_score_threshold
 
     def answer_question(self, question: str, chat_history: List[dict], **kwargs: dict):
         config = ConfigHelper.get_active_config_or_default()
@@ -35,8 +39,28 @@ class QuestionAnswerTool(AnsweringToolBase):
         llm_helper = LLMHelper()
         keyword_search = kwargs.get("keywords", [])
 
+        results = self.vector_store.client.search(
+            search_text=keyword_search,
+            search_fields=["keywords"],
+            vector_queries=[
+                VectorizedQuery(
+                    vector=np.array(self.vector_store.embed_query(
+                        question), dtype=np.float32).tolist(),
+                    k_nearest_neighbors=self.search_k_nearest_neighbors,
+                    fields=FIELDS_CONTENT_VECTOR,
+                )
+            ],
+        )
+        
+        filtered_results = []
+        for result in results:
+            score = result.get('@search.score', 0)
+            is_skipped = score < self.search_score_threshold
+            print((f"ID: {result['id']}, Source: {result['source']} Score: {score} Skipped: {is_skipped}"))
+            if not is_skipped:
+                filtered_results.append(result)
+        
         # Retrieve documents as sources
-        from azure.search.documents.models import VectorizedQuery
         sources = [Document(
             page_content=result.pop(FIELDS_CONTENT),
             metadata=json.loads(result[FIELDS_METADATA])
@@ -44,19 +68,7 @@ class QuestionAnswerTool(AnsweringToolBase):
             else {
                 k: v for k, v in result.items() if k != FIELDS_CONTENT_VECTOR
             },
-        ) for result in
-            self.vector_store.client.search(
-            search_text=keyword_search,
-            search_fields=["keywords"],
-            vector_queries=[
-                VectorizedQuery(
-                    vector=np.array(self.vector_store.embed_query(
-                        question), dtype=np.float32).tolist(),
-                    k_nearest_neighbors=4,
-                    fields=FIELDS_CONTENT_VECTOR,
-                )
-            ],
-        )]
+        ) for result in filtered_results]
 
         # Generate answer from sources
         answer_generator = LLMChain(
