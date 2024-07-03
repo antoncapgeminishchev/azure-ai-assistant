@@ -106,7 +106,18 @@ It is possible to run code and debug locally. To do so we need:
 1. In the VS Code window that opens, once the project files show up (this may take several minutes), open a terminal window
 1. Run `az login`
 1. From vscode (Ctrl+Shift+D), select "Launch Frontend (api)" or "Launch Frontend (UI). You will also be able to place breakpoints in the code should you wish. This will automatically install any dependencies for Node and Python.
-1. After the application has been successfully deployed you will see a URL printed to the console.  Click that URL to interact with the application in your browser.
+1. After the application has been successfully deployed you will see a URL printed to the console.  Now you are able to interact with the application. Verify it by sending HTTP request. E.g.:
+
+    `curl --location 'http://<app_address>/api/conversation/custom' \
+    --header 'Content-Type: application/json' \
+    --header 'Authorization: <your_token>' \
+    --data '{"messages":[{"role":"user","content":"show me healthcare projects"}],"conversation_id": <your_conversation_id>}'`
+
+    > **Note**: 
+    > - app_address - url of your local app (api)
+    > - your_token - authorization token, you can get from Azure-deployed chat requests 
+    (Located within VS Code: Azure Tab->Remote Resources->VS Subscription->App Services->\*-website-\*)
+    > - your_conversation_id - conversation ID you can get from Azure-deployed chat requests
 
 ## Deploy
 ### Pre-requisites 
