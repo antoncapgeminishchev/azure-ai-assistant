@@ -1,6 +1,6 @@
 # Chat with your data - Solution accelerator
 
-[**USER STORY**](#user-story) | [**DEPLOY**](#Deploy) | [**SUPPORTING DOCUMENTATION**](#supporting-documentation) | [**CUSTOMER TRUTH**](#customer-truth)\
+[**USER STORY**](#user-story) | [**LOCAL RUN & DEBUG**](#local-debug) | [**DEPLOY**](#Deploy) | [**SUPPORTING DOCUMENTATION**](#supporting-documentation) | [**CUSTOMER TRUTH**](#customer-truth)\
 \
 \
 ![User Story](/media/userStory.png)  
@@ -94,6 +94,20 @@ Learn more about deploying the Teams extension [here](./docs/TEAMS_EXTENSION.md)
 \
 \
 ![One-click Deploy](/media/oneClickDeploy.png)
+
+## Local run & debug
+It is possible to run code and debug locally. To do so we need:
+
+1. Start Docker (install it if not already installed)
+1. Open the project:
+    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/chat-with-your-data-solution-accelerator)
+
+1. Copy the `.env.sample` file (not the one from repository, ask teammates) to your development environment's `.env` file
+1. In the VS Code window that opens, once the project files show up (this may take several minutes), open a terminal window
+1. Run `az login`
+1. From vscode (Ctrl+Shift+D), select "Launch Frontend (api)" or "Launch Frontend (UI). You will also be able to place breakpoints in the code should you wish. This will automatically install any dependencies for Node and Python.
+1. After the application has been successfully deployed you will see a URL printed to the console.  Click that URL to interact with the application in your browser.
+
 ## Deploy
 ### Pre-requisites 
 - Azure subscription - [Create one for free](https://azure.microsoft.com/free/) with owner access.
