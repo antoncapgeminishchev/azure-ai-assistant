@@ -122,6 +122,10 @@ It is possible to run code and debug locally. To do so we need:
     (Located within VS Code: Azure Tab->Remote Resources->VS Subscription->App Services->\*-website-\*)
     > - your_conversation_id - conversation ID you can get from Azure-deployed chat requests
 
+#### Tips->
+1. Make sure in dev container python use correct interpreter: Shift+Cmd+P -> Python: Select Interpreter -> choose that one which is from dev container
+2. To launch apps without auth add to .env DISABLE_AUTH=true and AUTH_DISABLED=true
+
 ## Deploy
 ### Pre-requisites 
 - Azure subscription - [Create one for free](https://azure.microsoft.com/free/) with owner access.
