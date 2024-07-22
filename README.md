@@ -1,6 +1,6 @@
 # Chat with your data - Solution accelerator
 
-[**USER STORY**](#user-story) | [**DEPLOY**](#Deploy) | [**SUPPORTING DOCUMENTATION**](#supporting-documentation) | [**CUSTOMER TRUTH**](#customer-truth)\
+[**USER STORY**](#user-story) | [**LOCAL RUN & DEBUG**](#local-debug) | [**DEPLOY**](#Deploy) | [**SUPPORTING DOCUMENTATION**](#supporting-documentation) | [**CUSTOMER TRUTH**](#customer-truth)\
 \
 \
 ![User Story](/media/userStory.png)  
@@ -94,6 +94,38 @@ Learn more about deploying the Teams extension [here](./docs/TEAMS_EXTENSION.md)
 \
 \
 ![One-click Deploy](/media/oneClickDeploy.png)
+
+## Local run & debug
+It is possible to run code and debug locally. To do so we need:
+
+1. From Azure portal go to <__resource_group__> -> \<__keyvault__\> -> __Access policies__ -> Add your acc with permissions to be able to work with KeyVault (Get, List)
+1. Start Docker (install it if not already installed)
+1. Open the project:
+    [![Open in Dev Containers](https://img.shields.io/static/v1?style=for-the-badge&label=Dev%20Containers&message=Open&color=blue&logo=visualstudiocode)](https://vscode.dev/redirect?url=vscode://ms-vscode-remote.remote-containers/cloneInVolume?url=https://github.com/azure-samples/chat-with-your-data-solution-accelerator)
+
+1. Copy the `.env.sample` file (not the one from repository, ask teammates) to your development environment's `.env` file
+1. In the VS Code window that opens, once the project files show up (this may take several minutes), open a terminal window
+1. Run `azd auth login` with your corporate acc.
+1. Run `azd env new <environment>`
+1. Run `az login`
+1. From vscode (Ctrl+Shift+D), select "Launch Frontend (api)" or "Launch Frontend (UI). You will also be able to place breakpoints in the code should you wish. This will automatically install any dependencies for Node and Python.
+1. After the application has been successfully deployed you will see a URL printed to the console.  Now you are able to interact with the application. Verify it by sending HTTP request. E.g.:
+
+    `curl --location 'http://<app_address>/api/conversation/custom' \
+    --header 'Content-Type: application/json' \
+    --header 'Authorization: <your_token>' \
+    --data '{"messages":[{"role":"user","content":"show me healthcare projects"}],"conversation_id": <your_conversation_id>}'`
+
+    > **Note**: 
+    > - app_address - url of your local app (api)
+    > - your_token - authorization token, you can get from Azure-deployed chat requests 
+    (Located within VS Code: Azure Tab->Remote Resources->VS Subscription->App Services->\*-website-\*)
+    > - your_conversation_id - conversation ID you can get from Azure-deployed chat requests
+
+#### Tips->
+1. Make sure in dev container python use correct interpreter: Shift+Cmd+P -> Python: Select Interpreter -> choose that one which is from dev container
+2. To launch apps without auth add to .env DISABLE_AUTH=true and AUTH_DISABLED=true
+
 ## Deploy
 ### Pre-requisites 
 - Azure subscription - [Create one for free](https://azure.microsoft.com/free/) with owner access.
