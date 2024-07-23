@@ -1,13 +1,13 @@
 import json
-from .AzureBlobStorageHelper import AzureBlobStorageClient
-from ..document_chunking.Strategies import ChunkingSettings, ChunkingStrategy
+from .azure_blob_storage_client import AzureBlobStorageClient
+from ..document_chunking.strategies import ChunkingSettings, ChunkingStrategy
 from ..document_loading import LoadingSettings, LoadingStrategy
 from .DocumentProcessorHelper import Processor
-from .OrchestratorHelper import (
+from .orchestrator_helper import (
     OrchestrationSettings,
     OrchestrationStrategy,
 )
-from .EnvHelper import EnvHelper
+from .env_helper import EnvHelper
 
 CONFIG_CONTAINER_NAME = "config"
 

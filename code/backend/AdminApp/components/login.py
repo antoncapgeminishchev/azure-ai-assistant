@@ -1,7 +1,7 @@
 import traceback
 import requests
 import streamlit as st
-from batch.utilities.helpers.EnvHelper import EnvHelper
+from batch.utilities.helpers.env_helper import EnvHelper
 import logging
 from streamlit_msal import Msal
 

@@ -2,7 +2,7 @@ import logging
 import os
 import streamlit as st
 from dotenv import load_dotenv
-from batch.utilities.helpers.EnvHelper import EnvHelper
+from batch.utilities.helpers.env_helper import EnvHelper
 from components.login import isAdmin, isLoggedIn, logout
 from streamlit_msal import Msal
 

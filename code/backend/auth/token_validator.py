@@ -1,6 +1,6 @@
-from jose import jwt
 import json
 from urllib.request import urlopen
+from jose import jwt
 
 
 class TokenValidator:

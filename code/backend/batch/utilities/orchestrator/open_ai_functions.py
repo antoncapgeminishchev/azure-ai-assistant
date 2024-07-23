@@ -4,8 +4,8 @@ import json
 
 from .orchestrator_base import OrchestratorBase
 from ..common.answer import Answer
-from ..common.SourceDocument import SourceDocument
-from ..helpers.EnvHelper import EnvHelper
+from ..common.source_document import SourceDocument
+from ..helpers.env_helper import EnvHelper
 from ..helpers.llm_helper import LLMHelper
 from ..helpers.PowerPointHelper import PowerPointHelper, ProjectPresentationData
 from ..tools.post_prompt_tool import PostPromptTool

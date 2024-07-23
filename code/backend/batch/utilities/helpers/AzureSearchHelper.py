@@ -5,8 +5,8 @@ from azure.search.documents.indexes.models import (
     SearchFieldDataType,
     SimpleField,
 )
-from .LLMHelper import LLMHelper
-from .EnvHelper import EnvHelper
+from .llm_helper import LLMHelper
+from .env_helper import EnvHelper
 
 
 class AzureSearchHelper:

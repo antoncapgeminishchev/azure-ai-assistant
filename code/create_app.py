@@ -6,13 +6,15 @@ import functools
 import json
 import logging
 import mimetypes
-from os import path
+from os import path, environ
 import sys
+import jwt
 import requests
-from openai import AzureOpenAI, Stream, RateLimitError, APIStatusError
+from openai import AzureOpenAI, Stream, APIStatusError
 from openai.types.chat import ChatCompletionChunk
 from flask import Flask, Response, request, Request, jsonify
 from dotenv import load_dotenv
+from backend.auth.token_validator import TokenValidator
 from backend.batch.utilities.helpers.env_helper import EnvHelper
 from backend.batch.utilities.helpers.orchestrator_helper import Orchestrator
 from backend.batch.utilities.helpers.config.config_helper import ConfigHelper
@@ -23,6 +25,34 @@ from azure.identity import DefaultAzureCredential
 ERROR_429_MESSAGE = "We're currently experiencing a high number of requests for the service you're trying to access. Please wait a moment and try again."
 ERROR_GENERIC_MESSAGE = "An error occurred. Please try again. If the problem persists, please contact the site administrator."
 logger = logging.getLogger(__name__)
+
+
+def auth_required(f):
+    @functools.wraps(f)
+    def decorated_function(*args, **kwargs):
+        if environ.get("DISABLE_AUTH"):
+            return f(*args, **kwargs)
+
+        token = request.headers.get("Authorization")
+        if not token:
+            return Response("Unauthorized", status=401)
+
+        try:
+            TokenValidator().validate(token)
+        except jwt.ExpiredSignatureError:
+            return Response("Token expired", status=401)
+        except jwt.InvalidTokenError:
+            return Response("Unauthorized", status=401)
+        except Exception as e:
+            errorMessage = str(e)
+            logging.exception(
+                f"Exception occured while access token validation | {errorMessage}"
+            )
+            return Response("Internal service errror", status=500)
+        return f(*args, **kwargs)
+
+    return decorated_function
+
 
 def stream_with_data(response: Stream[ChatCompletionChunk]):
     """This function streams the response from Azure OpenAI with data."""
@@ -403,6 +433,7 @@ def create_app():
             return jsonify({"error": ERROR_GENERIC_MESSAGE}), 500
 
     @app.route("/api/conversation", methods=["POST"])
+    @auth_required
     async def conversation():
         conversation_flow = env_helper.CONVERSATION_FLOW
         if conversation_flow == ConversationFlow.CUSTOM.value:
@@ -420,6 +451,7 @@ def create_app():
             )
 
     @app.route("/api/speech", methods=["GET"])
+    @auth_required
     def speech_config():
         """Get the speech config for Azure Speech."""
         try:

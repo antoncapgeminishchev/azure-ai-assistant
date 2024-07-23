@@ -22,7 +22,7 @@ from os import path
 from typing import Optional
 
 from batch.utilities.helpers.ConfigHelper import ConfigHelper
-from batch.utilities.helpers.EnvHelper import EnvHelper
+from batch.utilities.helpers.env_helper import EnvHelper
 from batch.utilities.helpers.SharePointHelper import SharePointHelper
 from components.login import isLoggedIn
 from components.menu import menu
@@ -57,8 +57,7 @@ def main():
     ) -> UserDelegationKey:
         # Get a user delegation key that's valid for 1 day
         delegation_key_start_time = datetime.utcnow()
-        delegation_key_expiry_time = delegation_key_start_time + \
-            timedelta(days=1)
+        delegation_key_expiry_time = delegation_key_start_time + timedelta(days=1)
 
         user_delegation_key = blob_service_client.get_user_delegation_key(
             key_start_time=delegation_key_start_time,
@@ -157,8 +156,7 @@ def main():
             blob_client.upload_blob(
                 bytes_data,
                 overwrite=True,
-                content_settings=ContentSettings(
-                    content_type=content_type + charset),
+                content_settings=ContentSettings(content_type=content_type + charset),
             )
             st.session_state["file_url"] = (
                 blob_client.url
@@ -191,8 +189,7 @@ def main():
             blob_client.upload_blob(
                 bytes_data,
                 overwrite=True,
-                content_settings=ContentSettings(
-                    content_type=content_type + charset),
+                content_settings=ContentSettings(content_type=content_type + charset),
             )
             # Generate a SAS URL to the blob and return it
             st.session_state["file_url"] = (

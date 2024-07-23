@@ -1,7 +1,7 @@
 import streamlit as st
 from components.login import isLoggedIn, logout
 import os
-from batch.utilities.helpers.EnvHelper import EnvHelper
+from batch.utilities.helpers.env_helper import EnvHelper
 
 env_helper: EnvHelper = EnvHelper()
 

@@ -3,7 +3,7 @@ import requests
 
 from urllib.parse import urlparse
 from bs4 import BeautifulSoup
-from batch.utilities.helpers.EnvHelper import EnvHelper
+from batch.utilities.helpers.env_helper import EnvHelper
 
 env_helper: EnvHelper = EnvHelper()
 
