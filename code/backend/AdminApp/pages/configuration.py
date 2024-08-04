@@ -96,6 +96,7 @@ def main():
                 "Your post answering prompt doesn't contain the variable `{answer}`"
             )
 
+
     try:
         with st.expander("Orchestrator configuration", expanded=True):
             cols = st.columns([2, 4])
@@ -179,6 +180,43 @@ def main():
             )
             st.checkbox("Log tokens", key="log_tokens")
 
+
+        crawler_config = config.crawling
+        with st.expander("Crawler configuration", expanded=True):
+            crawl_enabled = st.checkbox("Enable crawling", value=crawler_config.crawl_enabled, key="crawl_enabled")
+            if crawl_enabled:
+                st.text_area("Crawl target URLs(split by space)", value=crawler_config.crawl_target_urls, key="crawl_target_urls", help="Enter URLs separated by space")
+                
+                
+                st.markdown("### Cron Schedule")
+                with st.container():  # Create a container for the cron schedule fields
+                     # Input fields for the cron expression components
+                    crawl_schedule_second = st.number_input("Second", min_value=0, max_value=59, value=crawler_config.crawl_cron.seconds, key="seconds")  # Input for second
+                    crawl_schedule_minute = st.number_input("Minute", min_value=0, max_value=59, value=crawler_config.crawl_cron.minutes, key="minutes")
+                    crawl_schedule_hour = st.number_input("Hour", min_value=0, max_value=23, value=crawler_config.crawl_cron.hours, key="hours")
+                    crawl_schedule_day = st.number_input("Day of Month", min_value=1, max_value=31, value=crawler_config.crawl_cron.days, key="days")
+                    crawl_schedule_month = st.number_input("Month", min_value=1, max_value=12, value=crawler_config.crawl_cron.months, key="months")
+                    # Select box for day of week with options
+                    crawl_schedule_day_of_week = st.selectbox("Day of Week", ["*", "0 (Sunday)", "1 (Monday)", "2 (Tuesday)", "3 (Wednesday)", "4 (Thursday)", "5 (Friday)", "6 (Saturday)"], key="day_of_week")
+
+                    if crawl_schedule_day_of_week != "*":
+                        crawl_schedule_day_of_week = crawl_schedule_day_of_week.split()[0]
+
+                    crawl_schedule_str = f"{crawl_schedule_second} {crawl_schedule_minute} {crawl_schedule_hour} {crawl_schedule_day} {crawl_schedule_month} {crawl_schedule_day_of_week}"
+                    st.write(f"Cron Schedule: `{crawl_schedule_str}`")  # Display the generated cron schedule
+
+
+
+                crawl_delay_seconds_str = st.text_input("Crawl delay (seconds)", value=str(crawler_config.crawl_delay_seconds), key="crawl_delay_seconds")
+                crawl_retry_count_str = st.text_input("Crawl retry count", value=str(crawler_config.crawl_retry_count), key="crawl_retry_count")
+
+                # Convert the string inputs back to integers with validation
+                try:
+                    crawl_delay_seconds = int(crawl_delay_seconds_str)
+                    crawl_retry_count = int(crawl_retry_count_str)
+                except ValueError:
+                    st.error("Please enter valid integers for the crawl settings.")
+        
         if st.button("Save configuration"):
             document_processors = list(
                 map(
@@ -217,6 +255,22 @@ def main():
                     "log_tokens": st.session_state["log_tokens"],
                 },
                 "orchestrator": {"strategy": st.session_state["orchestrator_strategy"]},
+                "crawling": {
+                    "crawl_enabled": st.session_state["crawl_enabled"],
+                    "crawl_schedule_str": crawl_schedule_str,
+                    "crawl_cron": {
+                        "seconds": st.session_state["seconds"],
+                        "minutes": st.session_state["minutes"],
+                        "hours": st.session_state["hours"],
+                        "days": st.session_state["days"],
+                        "months": st.session_state["months"],
+                        "day_of_week": st.session_state["day_of_week"],
+
+                    },
+                    "crawl_target_urls": st.session_state["crawl_target_urls"],
+                    "crawl_delay_seconds": st.session_state["crawl_delay_seconds"],
+                    "crawl_retry_count": st.session_state["crawl_retry_count"],
+                }
             }
             ConfigHelper.save_config_as_active(current_config)
             st.success("Configuration saved successfully!")

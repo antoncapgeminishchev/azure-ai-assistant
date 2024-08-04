@@ -32,6 +32,7 @@ class Config:
         self.orchestrator = OrchestrationSettings(
             config.get("orchestrator", self.default_orchestration_settings)
         )
+        self.crawling = Crawling(config["crawling"])
 
     def get_available_document_types(self):
         return ["txt", "pdf", "url", "html", "md", "jpeg", "jpg", "png", "docx", "json"]
@@ -65,6 +66,25 @@ class Logging:
     def __init__(self, logging: dict):
         self.log_user_interactions = logging["log_user_interactions"]
         self.log_tokens = logging["log_tokens"]
+
+class Crawling:
+    def __init__(self, crawling: dict):
+        self.crawl_enabled = crawling["crawl_enabled"]
+        self.crawl_cron = Cron(crawling["crawl_cron"])
+        self.crawl_schedule_str = crawling["crawl_schedule_str"]
+        self.crawl_target_urls = crawling["crawl_target_urls"]
+        self.crawl_delay_seconds = crawling["crawl_delay_seconds"]
+        self.crawl_retry_count = crawling["crawl_retry_count"]
+
+class Cron:
+    def __init__(self, cron: dict):
+        self.seconds = cron["seconds"]
+        self.minutes = cron["minutes"]
+        self.hours = cron["hours"]
+        self.days = cron["days"]
+        self.months = cron["months"]
+        self.day_of_week = cron["day_of_week"]
+
 
 
 class ConfigHelper:
@@ -215,5 +235,20 @@ Answer: {answer}""",
             ],
             "logging": {"log_user_interactions": True, "log_tokens": True},
             "orchestrator": {"strategy": env_helper.ORCHESTRATION_STRATEGY},
+            "crawling": {
+                "crawl_enabled": False,
+                "crawl_cron": {
+                    "seconds": 0,
+                    "minutes": 0,
+                    "hours": 0,
+                    "days": 1,
+                    "months": 1,
+                    "day_of_week": 0,
+                },
+                "crawl_schedule_str": "* * * * * *",
+                "crawl_target_urls": [],
+                "crawl_delay_seconds": 86400,
+                "crawl_retry_count": 3,
+            }
         }
         return Config(default_config)
